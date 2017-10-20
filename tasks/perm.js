@@ -1,7 +1,8 @@
 var moment = require('moment-timezone');
 var axios = require('axios');
 var { Employer, Case } = require('../models');
-var winston = require('winston')
+var winston = require('winston');
+const Sequelize = require('sequelize');
 
 /**
  * @typedef {[number, string, string, string, string, string, string, string, string, string, number, string, string]} Row
@@ -63,10 +64,9 @@ async function fetchDataAt(date, page) {
       /** @type {Row[]} */
       let rows = data.ROWS;
 
-      rows.forEach(row => {
+      for (let i = 0; i < rows.length; i++) {
+        let row = rows[i];
         let [internalId, caseNumber, postingDate, caseType, status, employerName, workStartDate, workEndDate, jobTitle, state, visaClass, jobOrder, htmlTag] = row;
-        
-        if (employerName === '') throw new Error('Employer name is empty');
 
         Employer.findOrCreate({where: {name: employerName}}).spread((employer, created) => {
           Case.findOrCreate({where: {caseNumber}, defaults: {
@@ -79,12 +79,15 @@ async function fetchDataAt(date, page) {
             }
           });
         });
-      });
+        
+      };
 
       let hasNextPage = data.PAGE < data.TOTAL;
 
       if (hasNextPage) {
-        await fetchDataAt(date, page + 1);
+        return await fetchDataAt(date, page + 1);
+      } else {
+        winston.log('info', 'stop fetching');
       }
     } else {
       throw new Error('data is empty');
@@ -96,9 +99,9 @@ async function fetchDataAt(date, page) {
 
 async function crawlLatest() {
   const yesterday = getYesterdayDate();
-  winston.log('info', 'perm crawl latest start', {date: yesterday});
+  winston.log('info', 'perm crawl latest start', {date: yesterday.format()});
 
-  await fetchDataAt(yesterday, 1);
+  return await fetchDataAt(yesterday, 1);
 }
 
 /**
@@ -115,7 +118,13 @@ async function crawlAllBetween(from, to) {
   }
 
   winston.log('info', 'perm crawl within range done');
+
+  return;
 }
 
+exports.crawlLatest = crawlLatest;
+
+// fetchDataAt(moment('2017-10-16').tz("America/Los_Angeles"), 1);
 // crawlLatest();
-crawlAllBetween(moment('2017-10-10').tz("America/Los_Angeles"), moment('2017-10-16').tz("America/Los_Angeles"));
+// crawlAllBetween(moment('2017-10-10').tz("America/Los_Angeles"), moment('2017-10-16').tz("America/Los_Angeles"));
+// Employer.findAll({where: {name: '123'}});

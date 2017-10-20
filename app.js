@@ -4,6 +4,9 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var CronJob = require('cron').CronJob;
+var winston = require('winston');
+var { crawlLatest } = require('./tasks/perm');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -42,5 +45,14 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+// cron jobs
+var permCrawlJob = new CronJob('08 16 * * *', function() {
+  winston.log('info', 'perm crawl job starts');
+  crawlLatest();
+}, () => {
+  winston.log('info', 'perm crawl job ends');
+}, false, 'America/Los_Angeles');
+permCrawlJob.start();
 
 module.exports = app;
