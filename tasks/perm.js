@@ -5,9 +5,7 @@ var winston = require('winston')
 
 /**
  * @typedef {[number, string, string, string, string, string, string, string, string, string, number, string, string]} Row
- */
-
-/**
+ * 
  * @typedef {Object} Data
  * @property {number} TOTAL
  * @property {number} RECORDS
@@ -37,12 +35,15 @@ function getUrl(date, page) {
 }
 
 /**
- * @param {number} page 
+ * @param {object} date Moment object
+ * @param {number} page
  * @return {Promise}
  */
-async function fetchData(page) {
-  let yesterday = getYesterdayDate();
-  let url = getUrl(yesterday, page);
+async function fetchDataAt(date, page) {
+  if (!date || !(date instanceof moment)) throw new Error('incorrect date format');
+  if (page < 1 || !Number.isInteger(page)) throw new Error('incorrect page number');
+
+  let url = getUrl(date, page);
   try {
     let result = await axios.get(url);
 
@@ -54,6 +55,7 @@ async function fetchData(page) {
       if (data.RECORDS === 0) throw new Error('data is empty');
 
       winston.log('info', 'data fetched success', {
+        date: date.format(),
         total: data.RECORDS,
         page: `${page}/${data.TOTAL}`
       });
@@ -82,7 +84,7 @@ async function fetchData(page) {
       let hasNextPage = data.PAGE < data.TOTAL;
 
       if (hasNextPage) {
-        fetchData(page + 1);
+        await fetchDataAt(date, page + 1);
       }
     } else {
       throw new Error('data is empty');
@@ -92,9 +94,28 @@ async function fetchData(page) {
   }
 }
 
-async function crawl() {
-  winston.log('info', 'perm crawl start');
-  fetchData(1);
+async function crawlLatest() {
+  const yesterday = getYesterdayDate();
+  winston.log('info', 'perm crawl latest start', {date: yesterday});
+
+  await fetchDataAt(yesterday, 1);
 }
 
-crawl();
+/**
+ * @param {object} from Moment
+ * @param {object} to Moment
+ */
+async function crawlAllBetween(from, to) {
+  winston.log('info', 'perm crawl between start', {from: from.format(), to: to.format()});
+
+  let flag = from;
+  while (flag.isBefore(to)) {
+    await fetchDataAt(flag, 1);
+    flag.add(1, 'days');
+  }
+
+  winston.log('info', 'perm crawl within range done');
+}
+
+// crawlLatest();
+crawlAllBetween(moment('2017-10-10').tz("America/Los_Angeles"), moment('2017-10-16').tz("America/Los_Angeles"));
