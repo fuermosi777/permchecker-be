@@ -70,7 +70,7 @@ async function fetchData(page) {
           Case.findOrCreate({where: {caseNumber}, defaults: {
             internalId, caseNumber, postingDate, caseType, status, employerId: employer.id, workStartDate, workEndDate, jobTitle, state, jobOrder
           }}).spread((thecase, caseCreated) => {
-            if (caseCreated) {
+            if (!caseCreated) {
               winston.log('warning', 'case already exist', {caseNumber}); 
             } else {
               winston.log('info', 'case created', {caseNumber}); 
