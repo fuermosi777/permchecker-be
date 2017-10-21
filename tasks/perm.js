@@ -1,8 +1,7 @@
 var moment = require('moment-timezone');
 var axios = require('axios');
-var { Employer, Case } = require('../models');
+var { Employer, Case, sequelize } = require('../models');
 var winston = require('winston');
-const Sequelize = require('sequelize');
 
 /**
  * @typedef {[number, string, string, string, string, string, string, string, string, string, number, string, string]} Row
@@ -88,6 +87,7 @@ async function fetchDataAt(date, page) {
         return await fetchDataAt(date, page + 1);
       } else {
         winston.log('info', 'stop fetching');
+        return;
       }
     } else {
       throw new Error('data is empty');
@@ -124,7 +124,9 @@ async function crawlAllBetween(from, to) {
 
 exports.crawlLatest = crawlLatest;
 
-// fetchDataAt(moment('2017-10-16').tz("America/Los_Angeles"), 1);
+fetchDataAt(moment('2017-10-16').tz("America/Los_Angeles"), 1).then(() => {
+  sequelize.close();
+});
 // crawlLatest();
 // crawlAllBetween(moment('2017-10-10').tz("America/Los_Angeles"), moment('2017-10-16').tz("America/Los_Angeles"));
 // Employer.findAll({where: {name: '123'}});
