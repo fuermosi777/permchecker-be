@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "nodemon ./bin/www",
-    "start": "node ./bin/www"
+    "start-prod": "NODE_ENV=production forever start ./bin/www 80"
   },
   "dependencies": {
     "axios": "^0.16.2",
