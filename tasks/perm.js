@@ -101,7 +101,10 @@ async function crawlLatest() {
   const yesterday = getYesterdayDate();
   winston.log('info', 'perm crawl latest start', {date: yesterday.format()});
 
-  return await fetchDataAt(yesterday, 1);
+  await fetchDataAt(yesterday, 1);
+
+  process.exit();
+  // sequelize.close();
 }
 
 /**
@@ -119,14 +122,14 @@ async function crawlAllBetween(from, to) {
 
   winston.log('info', 'perm crawl within range done');
 
-  return;
+  process.exit();
 }
 
 exports.crawlLatest = crawlLatest;
 
-fetchDataAt(moment('2017-10-16').tz("America/Los_Angeles"), 1).then(() => {
-  sequelize.close();
-});
-// crawlLatest();
+// fetchDataAt(moment('2017-10-16').tz("America/Los_Angeles"), 1).then(() => {
+//   sequelize.close();
+// });
+crawlLatest();
 // crawlAllBetween(moment('2017-10-10').tz("America/Los_Angeles"), moment('2017-10-16').tz("America/Los_Angeles"));
 // Employer.findAll({where: {name: '123'}});
