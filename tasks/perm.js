@@ -125,11 +125,22 @@ async function crawlAllBetween(from, to) {
   process.exit();
 }
 
-exports.crawlLatest = crawlLatest;
+let args = process.argv.slice(2);
+let subcommand = args[0];
+
+if (subcommand === 'latest') {
+  crawlLatest();
+} else if (subcommand === 'between') {
+  let from = args[1];
+  let to = args[2];
+  crawlAllBetween(moment(from).tz("America/Los_Angeles"), moment(to).tz("America/Los_Angeles"));
+} else {
+  process.exit();
+}
 
 // fetchDataAt(moment('2017-10-16').tz("America/Los_Angeles"), 1).then(() => {
 //   sequelize.close();
 // });
-crawlLatest();
+// crawlLatest();
 // crawlAllBetween(moment('2017-10-10').tz("America/Los_Angeles"), moment('2017-10-16').tz("America/Los_Angeles"));
 // Employer.findAll({where: {name: '123'}});
