@@ -46,6 +46,7 @@ async function fetchDataAt(date, page) {
   if (page < 1 || !Number.isInteger(page)) throw new Error('incorrect page number');
 
   let url = getUrl(date, page);
+
   try {
     let result = await axios.get(url);
 
@@ -69,18 +70,25 @@ async function fetchDataAt(date, page) {
         let row = rows[i];
         let [internalId, caseNumber, postingDate, caseType, status, employerName, workStartDate, workEndDate, jobTitle, state, visaClass, jobOrder, htmlTag] = row;
 
-        Employer.findOrCreate({where: {name: employerName}}).spread((employer, created) => {
-          Case.findOrCreate({where: {caseNumber}, defaults: {
+        let employer = await Employer.findOne({where: {name: employerName}});
+
+        if (employer) {
+          winston.log('warning', 'employer already exist', {employerName});
+        } else {
+          employer = await Employer.create({name: employerName});
+          winston.log('info', 'employer created', {employerName});
+        }
+
+        let perm = await Case.findOne({ where: { caseNumber}});
+
+        if (perm) {
+          winston.log('warning', 'case already exist', {caseNumber});
+        } else {
+          perm = await Case.create({
             internalId, caseNumber, postingDate, caseType, status, employerId: employer.id, workStartDate, workEndDate, jobTitle, state, jobOrder
-          }}).spread((thecase, caseCreated) => {
-            if (!caseCreated) {
-              winston.log('warning', 'case already exist', {caseNumber}); 
-            } else {
-              winston.log('info', 'case created', {caseNumber}); 
-            }
           });
-        });
-        
+          winston.log('info', 'case created', {caseNumber});
+        }
       };
 
       let hasNextPage = data.PAGE < data.TOTAL;
