@@ -3,6 +3,8 @@ var axios = require('axios');
 var { Employer, Case, sequelize } = require('../models');
 var winston = require('winston');
 
+const ROWS = 100;
+
 /**
  * @typedef {[number, string, string, string, string, string, string, string, string, string, number, string, string]} Row
  * 
@@ -31,7 +33,7 @@ function getYesterdayDate() {
  * @return {string}
  */
 function getUrl(date, page) {
-  return `https://lcr-pjr.doleta.gov/index.cfm?event=ehLCJRExternal.dspQuickCertSearchGridData&startSearch=1&case_number=&employer_business_name=&visa_class_id=6&state_id=all&location_range=10&location_zipcode=&job_title=&naic_code=&create_date=undefined&post_end_date=undefined&h1b_data_series=ALL&start_date_from=${date.format('MM/DD/YYYY')}&start_date_to=${date.format('MM/DD/YYYY')}&end_date_from=mm/dd/yyyy&end_date_to=mm/dd/yyyy&page=${page}&rows=20&sidx=create_date&sord=desc&_search=false`;
+  return `https://lcr-pjr.doleta.gov/index.cfm?event=ehLCJRExternal.dspQuickCertSearchGridData&startSearch=1&case_number=&employer_business_name=&visa_class_id=6&state_id=all&location_range=10&location_zipcode=&job_title=&naic_code=&create_date=undefined&post_end_date=undefined&h1b_data_series=ALL&start_date_from=${date.format('MM/DD/YYYY')}&start_date_to=${date.format('MM/DD/YYYY')}&end_date_from=mm/dd/yyyy&end_date_to=mm/dd/yyyy&page=${page}&rows=${ROWS}&sidx=create_date&sord=desc&_search=false`;
 }
 
 /**
