@@ -90,7 +90,7 @@ router.get('/newapprovals', async function(req, res, next) {
     /** @type {ApprovalStat[]} */
     let distribution = [];
     
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 40; i++) {
       distribution.unshift({
         total: null,
         date: moment(latest.date).subtract(i, 'days').format('YYYY-MM-DD')
