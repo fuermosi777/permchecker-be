@@ -44,7 +44,7 @@ router.get('/newapprovals', async function(req, res, next) {
 
     let last30Days = await Case.findAll({
       attributes: [
-        [ sequelize.fn('DATE', sequelize.col('postingDate')), 'postingDate'], 
+        [ sequelize.fn('DATE', sequelize.col('postingDate')), 'date'], 
         [ sequelize.fn('COUNT', '*'), 'total' ]
       ],
       group: [
