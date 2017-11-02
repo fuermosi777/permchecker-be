@@ -7,15 +7,57 @@ var moment = require('moment');
 
 /* GET cases listing. */
 router.get('/cases', async function(req, res, next) {
+  const limit = 50;
+
+  let { page } = req.query;
+
+  if (!page) {
+    winston.log('error', '/cases', 'param "page" is missing');
+    res.status(500).send('Missing params.');
+    return;
+  }
+
+  if (Number(page) <= 0) {
+    winston.log('error', '/cases', 'page number is too small');
+    res.status(500).send('Incorrect params.');
+    return;
+  }
+
+  let casesAll;
+
+  try {
+    casesAll = await Case.findAndCountAll();
+  } catch (err) {
+    winston.log('error', '/cases', {err: err.message});
+    res.status(500).send('Something broke!');
+    return;
+  }
+
+  let pages = Math.ceil(casesAll.count / limit);
+  let offset = limit * (page - 1);
+
+  if (Number(page) > pages) {
+    winston.log('error', '/cases', 'page number is too large');
+    res.status(500).send('Incorrect params.');
+    return;
+  }
+
   try {
     let cases = await Case.findAndCountAll({
-      limit: 20,
-      offset: 0,
+      limit,
+      offset,
+      order: [
+        [ 'postingDate', 'DESC' ]
+      ]
     });
+
+    cases.pages = pages;
+
     res.json(cases);
   } catch (err) {
     winston.log('error', '/cases', {err: err.message});
-    res.status(500).send('Something broke!')
+    res.status(500).send('Something broke!');
+    return;
   }
 });
 
