@@ -52,12 +52,9 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       onDelete: 'RESTRICT'
     }
-  }, {
-    classMethods: {
-      associate: function(models) {
-        Case.belongTo(models.Employer, {foreignKey: 'employerId'});
-      }
-    }
   });
+  Case.associate = models => {
+    Case.belongsTo(models.Employer, { foreignKey: 'employerId' });
+  };
   return Case;
 };

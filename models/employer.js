@@ -5,12 +5,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       unique: true
     }
-  }, {
-    classMethods: {
-      associate: function(models) {
-        Employer.hasMany(models.Case, {foreignKey: 'employerId'});
-      }
-    }
   });
+  Employer.associate = models => {
+    Employer.hasMany(models.Case);
+  }
   return Employer;
 };

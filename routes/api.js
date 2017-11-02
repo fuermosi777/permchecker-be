@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var { Case, sequelize } = require('../models');
+var { Case, Employer, sequelize } = require('../models');
 var winston = require('winston');
 var caseProcessing = require('../utils/case-processing');
 var moment = require('moment');
@@ -46,6 +46,9 @@ router.get('/cases', async function(req, res, next) {
     let rows = await Case.findAll({
       limit,
       offset,
+      include: [
+        { model: Employer }
+      ],
       order: [
         [ 'postingDate', 'DESC' ]
       ]
