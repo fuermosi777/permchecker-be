@@ -1,4 +1,7 @@
 'use strict';
+
+var caseProcessing = require('../utils/case-processing');
+
 module.exports = (sequelize, DataTypes) => {
   var Case = sequelize.define('Case', {
     internalId: {
@@ -51,6 +54,16 @@ module.exports = (sequelize, DataTypes) => {
       },
       onUpdate: 'CASCADE',
       onDelete: 'RESTRICT'
+    }
+  }, {
+    getterMethods: {
+      caseDate() {
+        if (this.caseNumber) {
+          return caseProcessing.toDate(this.caseNumber);
+        } else {
+          return null;
+        }
+      }
     }
   });
   Case.associate = models => {

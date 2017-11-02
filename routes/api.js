@@ -105,11 +105,8 @@ router.get('/newapprovals', async function(req, res, next) {
     // Get all latest approvals and create a group by count map
     let caseNumberMap = {};
     latestApprovals.rows.forEach(ap => {
-      /** @type {object} moment object */
-      let caseDate = caseProcessing.toDate(ap.caseNumber);
-
       /** @type {string} */
-      let dateKey = caseDate.format('YYYY-MM-DD');
+      let dateKey = ap.caseDate.format('YYYY-MM-DD');
 
       if (caseNumberMap.hasOwnProperty(dateKey)) {
         caseNumberMap[dateKey] += 1;
@@ -156,7 +153,7 @@ router.get('/newapprovals', async function(req, res, next) {
         distribution[i].total = 0;
       }
     }
-    
+
     /** @type {NewApprovals} */
     let result = {
       date: moment(postingDate).format('YYYY-MM-DD'),
