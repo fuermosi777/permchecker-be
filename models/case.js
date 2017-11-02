@@ -63,6 +63,13 @@ module.exports = (sequelize, DataTypes) => {
         } else {
           return null;
         }
+      },
+      stateAbbrev() {
+        if (this.state) {
+          return caseProcessing.shortState(this.state);
+        } else {
+          return null;
+        }
       }
     }
   });

@@ -1,4 +1,5 @@
 var moment = require('moment');
+var stateMap = require('./state');
 
 function toDay(caseNumber) {
   let parts = caseNumber.split('-');
@@ -19,8 +20,16 @@ function toDate(caseNumber) {
   return firstDayOfYear.add(dayOfYear, 'days');
 }
 
+function shortState(state) {
+  if (stateMap.hasOwnProperty(state)) {
+    return stateMap[state];
+  } else {
+    return 'OTHER';
+  }
+}
+
 module.exports = {
   toDate,
-  toDay
+  toDay,
+  shortState
 };
-
