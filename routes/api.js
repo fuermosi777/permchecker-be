@@ -43,7 +43,7 @@ router.get('/cases', async function(req, res, next) {
   }
 
   try {
-    let cases = await Case.findAndCountAll({
+    let rows = await Case.findAll({
       limit,
       offset,
       order: [
@@ -51,9 +51,12 @@ router.get('/cases', async function(req, res, next) {
       ]
     });
 
-    cases.pages = pages;
+    let json = {
+      rows,
+      pages
+    };
 
-    res.json(cases);
+    res.json(json);
   } catch (err) {
     winston.log('error', '/cases', {err: err.message});
     res.status(500).send('Something broke!');
