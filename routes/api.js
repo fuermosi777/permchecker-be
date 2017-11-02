@@ -5,11 +5,24 @@ var winston = require('winston');
 var caseProcessing = require('../utils/case-processing');
 var moment = require('moment');
 
+const { Op } = sequelize;
+
+function addKeywordToQuery(query, keyword) {
+  query.where = {
+    [Op.or]: [{
+      caseNumber: {
+        [Op.like]: `%${keyword}%`
+      }
+    }, 
+    sequelize.where(sequelize.col('Employer.name'), 'LIKE', `%${keyword}%`)
+  ]}
+}
+
 /* GET cases listing. */
 router.get('/cases', async function(req, res, next) {
   const limit = 50;
 
-  let { page } = req.query;
+  let { page, keyword } = req.query;
 
   if (!page) {
     winston.log('error', '/cases', 'param "page" is missing');
@@ -17,16 +30,16 @@ router.get('/cases', async function(req, res, next) {
     return;
   }
 
-  if (Number(page) <= 0) {
-    winston.log('error', '/cases', 'page number is too small');
-    res.status(500).send('Incorrect params.');
-    return;
+  let casesAll;
+  let query = {};
+
+  if (keyword) {
+    query.include = [ { model: Employer } ];
+    addKeywordToQuery(query, keyword)
   }
 
-  let casesAll;
-
   try {
-    casesAll = await Case.findAndCountAll();
+    casesAll = await Case.findAndCountAll(query);
   } catch (err) {
     winston.log('error', '/cases', {err: err.message});
     res.status(500).send('Something broke!');
@@ -36,23 +49,31 @@ router.get('/cases', async function(req, res, next) {
   let pages = Math.ceil(casesAll.count / limit);
   let offset = limit * (page - 1);
 
-  if (Number(page) > pages) {
-    winston.log('error', '/cases', 'page number is too large');
-    res.status(500).send('Incorrect params.');
-    return;
+  // pages can be 0 if search keyword and get nothing
+  if (pages > 0 && Number(page) > pages) {
+    page = pages;
+  }
+  if (offset < 0) {
+    offset = 0;
+  }
+
+  query = {
+    limit,
+    offset,
+    include: [
+      { model: Employer }
+    ],
+    order: [
+      [ 'postingDate', 'DESC' ]
+    ]
+  };
+
+  if (keyword) {
+    addKeywordToQuery(query, keyword)
   }
 
   try {
-    let rows = await Case.findAll({
-      limit,
-      offset,
-      include: [
-        { model: Employer }
-      ],
-      order: [
-        [ 'postingDate', 'DESC' ]
-      ]
-    });
+    let rows = await Case.findAll(query);
 
     let json = {
       rows,
