@@ -75,7 +75,7 @@ router.get('/cases', async function(req, res, next) {
   try {
     let rows = await Case.findAll(query);
 
-    rows.sort((a, b) => (moment(b.date).diff(moment(a.date))));
+    rows.sort((a, b) => (moment(b.caseDate).diff(moment(a.caseDate))));
 
     let json = {
       rows,
