@@ -20,7 +20,7 @@ function addKeywordToQuery(query, keyword) {
 
 /* GET cases listing. */
 router.get('/cases', async function(req, res, next) {
-  const limit = 50;
+  const limit = 25;
 
   let { page, keyword } = req.query;
 
@@ -64,7 +64,8 @@ router.get('/cases', async function(req, res, next) {
       { model: Employer }
     ],
     order: [
-      [ 'postingDate', 'DESC' ]
+      [ 'postingDate', 'DESC' ],
+      [ 'caseNumber', 'DESC' ]
     ]
   };
 
