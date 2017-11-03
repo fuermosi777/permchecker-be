@@ -64,6 +64,7 @@ router.get('/cases', async function(req, res, next) {
       { model: Employer }
     ],
     order: [
+      [ sequelize.literal(`${sequelize.col('internalId').col} * 1`), 'DESC' ],
       [ 'postingDate', 'DESC' ]
     ]
   };
@@ -74,8 +75,6 @@ router.get('/cases', async function(req, res, next) {
 
   try {
     let rows = await Case.findAll(query);
-
-    rows.sort((a, b) => (moment(b.caseDate).diff(moment(a.caseDate))));
 
     let json = {
       rows,
