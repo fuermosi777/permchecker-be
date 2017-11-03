@@ -64,8 +64,7 @@ router.get('/cases', async function(req, res, next) {
       { model: Employer }
     ],
     order: [
-      [ 'postingDate', 'DESC' ],
-      [ 'caseNumber', 'DESC' ]
+      [ 'postingDate', 'DESC' ]
     ]
   };
 
@@ -75,6 +74,8 @@ router.get('/cases', async function(req, res, next) {
 
   try {
     let rows = await Case.findAll(query);
+
+    rows.sort((a, b) => (moment(a.date).diff(moment(b.date))));
 
     let json = {
       rows,
