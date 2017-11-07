@@ -1,14 +1,25 @@
 var axios = require('axios');
 var winston = require('winston');
+var moment = require('moment');
 
 const appId = process.env.ONE_SIGNAL_APP_ID;
 const apiKey = process.env.ONE_SIGNAL_REST_API_KEY;
 
-console.log(appId, apiKey);
-
 async function sendNotification() {
   
   try {
+
+    //@ts-ignore
+    let info = await axios({
+      method: 'get',
+      url: 'https://permcheckerapp.com/api/newapprovals'
+    });
+
+    let { total, earliestDate, latestDate } = info.data;
+
+
+    if (!total || !earliestDate || !latestDate) throw new Error('Info fetch failed');
+
     //@ts-ignore
     await axios({
       method: 'post',
@@ -21,7 +32,7 @@ async function sendNotification() {
       data: {
         app_id: appId,
         contents: {
-          en: '437 records processed. Earliest is Oct 5, 2015 and latest is Jul 17, 2017'
+          en: `${total} records processed. Earliest is ${moment(earliestDate).format('MMM Do, YYYY')} and latest is ${moment(latestDate).format('MMM Do, YYYY')}.`
         },
         headings: {
           en: 'Daily PERM Updates'
@@ -46,7 +57,6 @@ async function sendNotification() {
       // Something happened in setting up the request that triggered an Error
       console.log('Error', err.message);
     }
-    console.log(err.config);
   }
 }
 
