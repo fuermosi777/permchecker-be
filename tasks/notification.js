@@ -1,12 +1,15 @@
 var axios = require('axios');
 var winston = require('winston');
 var moment = require('moment');
+var { track, EVENT, TYPE } = require('../utils/tracker');
 
 const appId = process.env.ONE_SIGNAL_APP_ID;
 const apiKey = process.env.ONE_SIGNAL_REST_API_KEY;
 
 async function sendNotification() {
   
+  track(EVENT.NOTIFICATION_SENDING_START, TYPE.INFO, {});
+
   try {
 
     //@ts-ignore
@@ -21,7 +24,7 @@ async function sendNotification() {
     if (!total || !earliestDate || !latestDate) throw new Error('Info fetch failed');
 
     //@ts-ignore
-    await axios({
+    let response = await axios({
       method: 'post',
       url: '/notifications',
       baseURL: 'https://onesignal.com/api/v1',
@@ -40,7 +43,10 @@ async function sendNotification() {
         included_segments: ['All']
       }
     });
+
+    track(EVENT.NOTIFICATION_SENDING_DONE, TYPE.INFO, response.data);
   } catch (err) {
+    track(EVENT.NOTIFICATION_SENDING_FAILED, TYPE.ERROR, {err: err.message});
     // winston.log('error', 'make send notification api failed', {err: err.message});  
     if (err.response) {
       // The request was made and the server responded with a status code

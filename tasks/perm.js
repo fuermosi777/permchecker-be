@@ -2,6 +2,7 @@ var moment = require('moment-timezone');
 var axios = require('axios');
 var { Employer, Case, sequelize } = require('../models');
 var winston = require('winston');
+var { track, EVENT, TYPE } = require('../utils/tracker');
 
 const ROWS = 100;
 
@@ -103,15 +104,18 @@ async function fetchDataAt(date, page) {
       throw new Error('data is empty');
     }
   } catch (err) {
-    winston.log('error', 'perm fetch data failed', {url, err});  
+    winston.log('error', 'perm fetch data failed', {url, err: err.message});  
   }
 }
 
 async function crawlLatest() {
   const yesterday = getYesterdayDate();
   winston.log('info', 'perm crawl latest start', {date: yesterday.format()});
+  track(EVENT.CRAWL_LATEST_PERM_STARTED, TYPE.INFO, {});
 
   await fetchDataAt(yesterday, 1);
+
+  track(EVENT.CRAWL_LATEST_PERM_DONE, TYPE.INFO, {});
 
   process.exit();
   // sequelize.close();
@@ -143,7 +147,7 @@ if (subcommand === 'latest') {
 } else if (subcommand === 'between') {
   let from = args[1];
   let to = args[2];
-  crawlAllBetween(moment(from).tz("America/Los_Angeles"), moment(to).tz("America/Los_Angeles"));
+  crawlAllBetween(moment(from).tz('America/Los_Angeles'), moment(to).tz('America/Los_Angeles'));
 } else {
   process.exit();
 }
