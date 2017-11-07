@@ -8,7 +8,7 @@ const apiKey = process.env.ONE_SIGNAL_REST_API_KEY;
 
 async function sendNotification() {
   
-  track(EVENT.NOTIFICATION_SENDING_START, TYPE.INFO, {});
+  track(EVENT.NOTIFICATION_SENDING_START, TYPE.INFO);
 
   try {
 

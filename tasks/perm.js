@@ -40,7 +40,6 @@ function getUrl(date, page) {
 /**
  * @param {object} date Moment object
  * @param {number} page
- * @return {Promise}
  */
 async function fetchDataAt(date, page) {
   if (!date || !(date instanceof moment)) throw new Error('incorrect date format');
@@ -49,6 +48,7 @@ async function fetchDataAt(date, page) {
   let url = getUrl(date, page);
 
   try {
+    // @ts-ignore
     let result = await axios.get(url);
 
     if (result.hasOwnProperty('data')) {
@@ -98,26 +98,35 @@ async function fetchDataAt(date, page) {
         return await fetchDataAt(date, page + 1);
       } else {
         winston.log('info', 'stop fetching');
-        return;
+        return Promise.resolve(data.PAGE);
       }
     } else {
       throw new Error('data is empty');
     }
   } catch (err) {
-    winston.log('error', 'perm fetch data failed', {url, err: err.message});  
+    throw err;
   }
 }
 
 async function crawlLatest() {
   const yesterday = getYesterdayDate();
   winston.log('info', 'perm crawl latest start', {date: yesterday.format()});
-  track(EVENT.CRAWL_LATEST_PERM_STARTED, TYPE.INFO, {});
+  track(EVENT.CRAWL_PERM_STARTED, TYPE.INFO);
+  let page;
 
-  await fetchDataAt(yesterday, 1);
+  try {
+    page = await fetchDataAt(yesterday, 1);
+  } catch (err) {
+    track(EVENT.CRAWL_PERM_FAILED, TYPE.ERROR, {err: err.message});
+    winston.log('error', 'perm fetch data failed', {err: err.message});  
+  }
 
-  track(EVENT.CRAWL_LATEST_PERM_DONE, TYPE.INFO, {});
+  track(EVENT.CRAWL_PERM_DONE, TYPE.INFO, {page});
+  winston.log('info', 'perm fetch data done', {page});  
 
-  process.exit();
+  setTimeout(() => {
+    process.exit();
+  }, 1000);
   // sequelize.close();
 }
 
@@ -138,6 +147,17 @@ async function crawlAllBetween(from, to) {
 
   process.exit();
 }
+
+/**
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
 
 let args = process.argv.slice(2);
 let subcommand = args[0];

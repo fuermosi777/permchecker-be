@@ -8,7 +8,7 @@ var mixpanel = Mixpanel.init(process.env.MIXPANEL_TOKEN);
  * @param {object} data
  * @return {void}
  */
-function track(event, type, data) {
+function track(event, type, data = {}) {
   let d = Object.assign(data, {
     env: process.env.NODE_ENV
   });
@@ -16,10 +16,14 @@ function track(event, type, data) {
   mixpanel.track(event, d);
 }
 
+function trackTest() {
+  mixpanel.track('test');
+}
+
 const EVENT = {
-  CRAWL_LATEST_PERM_STARTED: 'crawl-latest-perm-started',
-  CRAWL_LATEST_PERM_DONE: 'crawl-latest-perm-done',
-  CRAWL_LATEST_PERM_FAILED: 'crawl-latest-perm-failed',
+  CRAWL_PERM_STARTED: 'crawl-perm-started',
+  CRAWL_PERM_DONE: 'crawl-perm-done',
+  CRAWL_PERM_FAILED: 'crawl-perm-failed',
   NOTIFICATION_SENDING_START: 'notification-sending-start',
   NOTIFICATION_SENDING_DONE: 'notification-sending-done',
   NOTIFICATION_SENDING_FAILED: 'notification-sending-failed'
@@ -33,6 +37,7 @@ const TYPE = {
 
 module.exports = {
   track,
+  trackTest,
   EVENT,
   TYPE
 };

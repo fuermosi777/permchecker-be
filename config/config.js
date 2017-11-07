@@ -7,7 +7,7 @@ module.exports = {
     database: "permchecker_dev",
     host: "127.0.0.1",
     dialect: "mysql",
-    logging: true
+    logging: false
   },
   production: {
     username: process.env.DB_USERNAME,
