@@ -2,6 +2,7 @@ var axios = require('axios');
 var winston = require('winston');
 var moment = require('moment');
 var { track, EVENT, TYPE } = require('../utils/tracker');
+var { buildKey } = require('../utils/build-key');
 
 const appId = process.env.ONE_SIGNAL_APP_ID;
 const apiKey = process.env.ONE_SIGNAL_REST_API_KEY;
@@ -11,11 +12,15 @@ async function sendNotification() {
   track(EVENT.NOTIFICATION_SENDING_START, TYPE.INFO);
 
   try {
+    let passport = buildKey();
 
     //@ts-ignore
     let info = await axios({
       method: 'get',
-      url: 'https://permcheckerapp.com/api/newapprovals'
+      url: 'https://permcheckerapp.com/api/newapprovals',
+      headers: {
+        passport
+      }
     });
 
     let { total, earliestDate, latestDate } = info.data;
