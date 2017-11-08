@@ -1,8 +1,38 @@
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 15px;
+  font-family: "SF UI Text", "Helvetica Neue",HelveticaNeue,Helvetica,Arial,sans-serif;
 }
 
 a {
-  color: #00B7FF;
+  color: #9753F4;
+}
+
+img.icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  display: block;
+}
+
+.title {
+  font-size: 30;
+  font-weight: bold;
+  text-align: center;
+}
+
+ul {
+
+}
+
+p.copy {
+  color: #696969;
+  font-size: 13px;
+  text-align: center;
 }

@@ -8,6 +8,7 @@ var timeout = require('connect-timeout')
 
 var index = require('./routes/index');
 var apiRoute = require('./routes/api');
+var webViewRoute = require('./routes/webview');
 
 var app = express();
 
@@ -30,6 +31,7 @@ app.all('/*', (req, res, next) => {
   next();
 });
 app.use('/', index);
+app.use('/webview', webViewRoute);
 app.use('/api', apiRoute);
 
 // catch 404 and forward to error handler
