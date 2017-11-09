@@ -198,4 +198,125 @@ router.get('/newapprovals', async function(req, res, next) {
   }
 });
 
+/**
+ * @typedef {object} Statistics
+ * @property {number} total
+ * @property {object[]} byState
+ * @property {object[]} byEmployer
+ * 
+ * Get total certified number, top 10 by state, by company
+ * @param {Date} from JS date
+ * @param {Date} to JS date
+ * @return {Statistics}
+ */
+async function getStatistics(from, to) {
+  try {
+    let total = await Case.count({
+      where: {
+        postingDate: {
+          [Op.between]: [from, to]
+        }
+      }
+    });
+
+    let byState = await Case.findAll({
+      attributes: [
+        [ sequelize.col('state'), 'state' ],
+        [ sequelize.fn('COUNT', '*'), 'total' ]
+      ],
+      group: 'state',
+      order: [
+        [ sequelize.fn('COUNT', '*'), 'DESC' ]
+      ],
+      where: {
+        postingDate: {
+          [Op.between]: [from, to]
+        }
+      },
+      limit: 10
+    });
+
+    let byEmployer = await Case.findAll({
+      attributes: [
+        [ sequelize.col('Employer.name'), 'employer' ],
+        [ sequelize.fn('COUNT', '*'), 'total' ]
+      ],
+      group: sequelize.col('Employer.name'),
+      order: [
+        [ sequelize.fn('COUNT', '*'), 'DESC' ]
+      ],
+      where: {
+        postingDate: {
+          [Op.between]: [from, to]
+        }
+      },
+      include: [
+        { model: Employer, attributes: [] }
+      ],
+      limit: 10
+    });
+
+    let res = { total, byState, byEmployer };
+
+    return res;
+  } catch (err) {
+    throw err;
+  }
+}
+
+/**
+ * @param {string} range 'this-week', 'last-week', etc
+ * @return {{from: Date, to: Date}}
+ */
+function getDateRange(range) {
+  let res = {from: null, to: null};
+  switch (range) {
+    case 'this-week':
+      res.from = moment().startOf('week').toDate();
+      res.to = moment().endOf('week').toDate();
+      break;
+    case 'last-week':
+      res.from = moment().startOf('week').subtract(7, 'days').toDate();
+      res.to = moment().endOf('week').subtract(7, 'days').toDate();
+      break;
+    case 'this-month':
+      res.from = moment().startOf('month').toDate();
+      res.to = moment().endOf('month').toDate();
+      break;
+    case 'this-year':
+      res.from = moment().startOf('year').toDate();
+      res.to = moment().endOf('year').toDate();
+      break;
+    default:
+      break;
+  }
+  return res;
+}
+
+/**
+ * Get statistics
+ */
+router.get('/statistics', async function(req, res, next) {
+  /** @type {string} 'this-week', 'last-week', 'this-month', 'this-year */
+  let range = req.query.range;
+  
+  /** @type {{from: Date, to: Date}} */
+  let { from, to } = getDateRange(range);
+
+  if (from === null || to === null) {
+    winston.log('error', '/statistics', {err: `incorrect date range string, got ${range}`});
+    res.status(500).send('Something broke!');
+    return;
+  }
+  
+  try {
+    let statistics = await getStatistics(from, to);
+
+    res.json(statistics);
+  } catch (err) {
+    winston.log('error', '/statistics', {err: err.message});
+    res.status(500).send('Something broke!')
+  }
+});
+
 module.exports = router;
