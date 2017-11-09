@@ -139,8 +139,13 @@ async function crawlAllBetween(from, to) {
 
   let flag = from;
   while (flag.isBefore(to)) {
-    await fetchDataAt(flag, 1);
-    flag.add(1, 'days');
+    try {
+      await fetchDataAt(flag, 1);
+    } catch (err) {
+      winston.log('error', 'perm crawl within range one day fail', {err: err.message});
+    } finally {
+      flag.add(1, 'days');
+    }
   }
 
   winston.log('info', 'perm crawl within range done');
