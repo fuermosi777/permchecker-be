@@ -127,6 +127,8 @@ router.get('/newapprovals', async function(req, res, next) {
       limit: 30
     });
 
+    last30Days.reverse();
+
     let latestApprovals = await Case.findAndCountAll({ where: { postingDate } });
 
     // Get all latest approvals and create a group by count map
