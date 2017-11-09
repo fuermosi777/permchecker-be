@@ -121,6 +121,10 @@ router.get('/newapprovals', async function(req, res, next) {
       group: [
         sequelize.fn('DATE', sequelize.col('postingDate'))
       ],
+      order: [
+        [ sequelize.fn('DATE', sequelize.col('postingDate')), 'DESC' ]
+      ],
+      limit: 30
     });
 
     let latestApprovals = await Case.findAndCountAll({ where: { postingDate } });
