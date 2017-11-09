@@ -20,7 +20,7 @@ function addKeywordToQuery(query, keyword) {
 }
 
 /* GET cases listing. */
-router.get('/cases', checkPassport, async function(req, res, next) {
+router.get('/cases', async function(req, res, next) {
   const limit = 25;
 
   let { page, keyword } = req.query;
@@ -106,7 +106,7 @@ router.get('/cases', checkPassport, async function(req, res, next) {
  * @property {ApprovalStat[]} distribution
  * 
  */
-router.get('/newapprovals', checkPassport, async function(req, res, next) {
+router.get('/newapprovals', async function(req, res, next) {
   try {
     let latestCase = await Case.findOne({ order: [[ 'postingDate', 'DESC' ]] });
 
