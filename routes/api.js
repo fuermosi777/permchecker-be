@@ -31,7 +31,7 @@ router.get('/cases', async function(req, res, next) {
     return;
   }
 
-  let casesAll;
+  let count;
   let query = {};
 
   if (keyword) {
@@ -40,14 +40,14 @@ router.get('/cases', async function(req, res, next) {
   }
 
   try {
-    casesAll = await Case.findAndCountAll(query);
+    count = await Case.count(query);
   } catch (err) {
     winston.log('error', '/cases', {err: err.message});
     res.status(500).send('Something broke!');
     return;
   }
 
-  let pages = Math.ceil(casesAll.count / limit);
+  let pages = Math.ceil(count / limit);
   let offset = limit * (page - 1);
 
   // pages can be 0 if search keyword and get nothing
