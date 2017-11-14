@@ -3,7 +3,7 @@ var router = express.Router();
 var { Case, Employer, sequelize } = require('../models');
 var winston = require('winston');
 var caseProcessing = require('../utils/case-processing');
-var moment = require('moment');
+var moment = require('moment-timezone');
 var checkPassport = require('../middlewares/check-passport');
 
 const { Op } = sequelize;
@@ -167,7 +167,7 @@ router.get('/newapprovals', async function(req, res, next) {
     for (let i = 0; i < 40; i++) {
       distribution.unshift({
         total: null,
-        date: moment(latest.date).subtract(i, 'days').format('YYYY-MM-DD')
+        date: moment(latest.date).tz('America/Los_Angeles').subtract(i, 'days').format('YYYY-MM-DD')
       });
     }
 
@@ -185,9 +185,9 @@ router.get('/newapprovals', async function(req, res, next) {
 
     /** @type {NewApprovals} */
     let result = {
-      date: moment(postingDate).format('YYYY-MM-DD'),
-      earliestDate: moment(earliest.date).format('YYYY-MM-DD'),
-      latestDate: moment(latest.date).format('YYYY-MM-DD'),
+      date: moment(postingDate).tz('America/Los_Angeles').format('YYYY-MM-DD'),
+      earliestDate: moment(earliest.date).tz('America/Los_Angeles').format('YYYY-MM-DD'),
+      latestDate: moment(latest.date).tz('America/Los_Angeles').format('YYYY-MM-DD'),
       total: latestApprovals.count,
       last30Days,
       distribution
