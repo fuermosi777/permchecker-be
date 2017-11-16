@@ -28,7 +28,7 @@ const ROWS = 100;
  * @return {Date}
  */
 function castDateToAmerica(dateRaw) {
-  return moment(dateRaw, 'MM/DD/YYYY').tz('America/Los_Angeles').toDate();
+  return moment.tz(dateRaw, 'MM/DD/YYYY', 'America/Los_Angeles').toDate();
 }
 
 /**
