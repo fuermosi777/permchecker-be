@@ -21,6 +21,16 @@ const ROWS = 100;
  * @property {Row[]} ROWS
  */
 
+
+/**
+ * Convert raw date text to PST date time
+ * @param {string} dateRaw
+ * @return {Date}
+ */
+function castDateToAmerica(dateRaw) {
+  return moment.tz(dateRaw, 'America/Los_Angeles').toDate();
+}
+
 /**
  * @return {object}
  */
@@ -86,7 +96,12 @@ async function fetchDataAt(date, page) {
           winston.log('warning', 'case already exist', {caseNumber});
         } else {
           perm = await Case.create({
-            internalId, caseNumber, postingDate, caseType, status, employerId: employer.id, workStartDate, workEndDate, jobTitle, state, jobOrder
+            internalId, caseNumber, 
+            postingDate: castDateToAmerica(postingDate), 
+            caseType, status, employerId: employer.id, 
+            workStartDate: castDateToAmerica(postingDate), 
+            workEndDate: castDateToAmerica(postingDate), 
+            jobTitle, state, jobOrder
           });
           winston.log('info', 'case created', {caseNumber});
         }
