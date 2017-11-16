@@ -65,13 +65,15 @@ router.get('/cases', async function(req, res, next) {
       { model: Employer }
     ],
     order: [
-      [ sequelize.literal(`${sequelize.col('internalId').col} * 1`), 'DESC' ],
       [ 'postingDate', 'DESC' ]
     ]
   };
 
   if (keyword) {
     addKeywordToQuery(query, keyword)
+
+    // If search, then also sort by the internal ID
+    query.order.unshift([ sequelize.literal(`${sequelize.col('internalId').col} * 1`), 'DESC' ]);
   }
 
   try {
