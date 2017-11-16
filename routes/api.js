@@ -188,8 +188,8 @@ router.get('/newapprovals', async function(req, res, next) {
     /** @type {NewApprovals} */
     let result = {
       date: moment(postingDate).format('YYYY-MM-DD'),
-      earliestDate: moment.tz(earliest.date, 'America/Los_Angeles').format('YYYY-MM-DD'),
-      latestDate: moment.tz(latest.date, 'America/Los_Angeles').format('YYYY-MM-DD'),
+      earliestDate: earliest.date,
+      latestDate: latest.date,
       total: latestApprovals.count,
       last30Days,
       distribution
