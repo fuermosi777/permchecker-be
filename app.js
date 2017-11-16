@@ -26,8 +26,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(timeout('10s'));
 
 app.all('/*', (req, res, next) => {
-  res.header('Cache-Control', 'public, max-age=18000');
-  res.setHeader('Expires', new Date(Date.now() + 18000000).toUTCString());
+  res.header('Cache-Control', 'public, max-age=3600');
+  res.setHeader('Expires', new Date(Date.now() + 3600000).toUTCString());
   next();
 });
 app.use('/', index);
