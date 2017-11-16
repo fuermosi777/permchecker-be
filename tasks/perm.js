@@ -24,11 +24,11 @@ const ROWS = 100;
 
 /**
  * Convert raw date text to PST date time
- * @param {string} dateRaw
+ * @param {string} dateRaw MM/DD/YYYY
  * @return {Date}
  */
 function castDateToAmerica(dateRaw) {
-  return moment.tz(dateRaw, 'America/Los_Angeles').toDate();
+  return moment(dateRaw, 'MM/DD/YYYY').tz('America/Los_Angeles').toDate();
 }
 
 /**
