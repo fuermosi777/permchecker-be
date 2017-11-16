@@ -16,7 +16,7 @@ function toDate(caseNumber) {
   let day = toDay(caseNumber);
   let year = day.substring(0, 2);
   let dayOfYear = Number(day.substring(2)) - 1;
-  let firstDayOfYear = moment(`20${year}-01-01`).tz('America/Los_Angeles');
+  let firstDayOfYear = moment.tz(`20${year}-01-01`, 'America/Los_Angeles');
   return firstDayOfYear.add(dayOfYear, 'days');
 }
 
