@@ -7,6 +7,49 @@ var { buildKey } = require('../utils/build-key');
 const appId = process.env.ONE_SIGNAL_APP_ID;
 const apiKey = process.env.ONE_SIGNAL_REST_API_KEY;
 
+/**
+ * @abstract
+ * @param {string} method 
+ * @param {string} url 
+ * @param {object} data 
+ */
+async function callOneSignal(method, url, data = null) {
+  try {
+    //@ts-ignore
+    let result = await axios({
+      method,
+      url,
+      baseURL: 'https://onesignal.com/api/v1',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Authorization': `Basic ${apiKey}`
+      },
+      data
+    });
+    if (result.hasOwnProperty('data')) {
+      return result.data;
+    }
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function callSendNotification(data) {
+  try {
+    return await callOneSignal('post', '/notifications', data);
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function callGetNotifications() {
+  try {
+    return await callOneSignal('get', `/notifications?app_id=${appId}&limit=1`);
+  } catch (err) {
+    throw err;
+  } 
+}
+
 async function sendNotification() {
   
   track(EVENT.NOTIFICATION_SENDING_START, TYPE.INFO);
@@ -27,26 +70,26 @@ async function sendNotification() {
 
 
     if (!total || !earliestDate || !latestDate) throw new Error('Info fetch failed');
+    let notifications = await callGetNotifications();
+    let notification = notifications.notifications[0];
+    let lastMsgEn = notification.contents.en;
+
+    let newMsgEn = `${total} records processed. Earliest is ${moment(earliestDate).format('MMM Do, YYYY')} and latest is ${moment(latestDate).format('MMM Do, YYYY')}.`;
+
+    if (lastMsgEn === newMsgEn) {
+      throw new Error('Data not updated. Dont send notification today.');
+    }
 
     //@ts-ignore
-    let response = await axios({
-      method: 'post',
-      url: '/notifications',
-      baseURL: 'https://onesignal.com/api/v1',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Authorization': `Basic ${apiKey}`
+    let response = await callSendNotification({
+      app_id: appId,
+      contents: {
+        en: newMsgEn
       },
-      data: {
-        app_id: appId,
-        contents: {
-          en: `${total} records processed. Earliest is ${moment(earliestDate).format('MMM Do, YYYY')} and latest is ${moment(latestDate).format('MMM Do, YYYY')}.`
-        },
-        headings: {
-          en: 'Daily PERM Updates'
-        },
-        included_segments: ['All']
-      }
+      headings: {
+        en: 'Daily PERM Updates'
+      },
+      included_segments: process.env.NODE_ENV === 'production' ? ['All'] : ['Test Users']
     });
 
     track(EVENT.NOTIFICATION_SENDING_DONE, TYPE.INFO, response.data);
