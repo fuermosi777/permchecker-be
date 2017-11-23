@@ -3,6 +3,7 @@ export ONE_SIGNAL_APP_ID=
 export ONE_SIGNAL_REST_API_KEY=
 export MIXPANEL_TOKEN=
 export API_SECRET=
+export PERMCHECKER_BE_INTERNAL_KEY=
 ```
 
 # Timezone

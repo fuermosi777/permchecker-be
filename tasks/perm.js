@@ -1,15 +1,12 @@
 var moment = require('moment-timezone');
 var axios = require('axios');
-var { Employer, Case, sequelize } = require('../models');
+var { Employer, Case, Cookie, sequelize } = require('../models');
 var winston = require('winston');
 var { track, EVENT, TYPE } = require('../utils/tracker');
 var puppeteer = require('puppeteer');
 
 const ROWS = 100;
 const DOL_PERM_LANDING_PAGE_URL = 'https://lcr-pjr.doleta.gov/index.cfm?event=ehlcjrexternal.dsplcrlanding';
-
-/** @global {string} cookie */
-let cookie = '';
 
 /**
  * @typedef {[number, string, string, string, string, string, string, string, string, string, number, string, string]} Row
@@ -66,22 +63,20 @@ async function fetchDataAt(date, page) {
   if (page < 1 || !Number.isInteger(page)) throw new Error('incorrect page number');
 
   let url = getUrl(date, page);
+  let cookie;
 
   // console.log(url);
+  try {
+    let cookieRecord = await Cookie.findAll({limit: 1, order: [[ 'createdAt', 'DESC' ]]});
 
-  if (!cookie) {
-    try {
-      cookie = await getReCaptchaCookie();
-    } catch (err) {
-      winston.log('error', 'cookie fetch failed', {err: err.message});
-      throw new Error('Cookie fetch failed');
+    if (cookieRecord.length === 0) {
+      throw new Error('No cookie found in database');
     }
 
-    winston.log('info', 'cookie updated successfully', {cookie});
-  }
+    cookie = cookieRecord[0].content;
 
-  if (!cookie) {
-    throw new Error('No cookie');
+  } catch (err) {
+    throw err;
   }
 
   try {
@@ -203,7 +198,7 @@ async function getReCaptchaCookie() {
   let browser;
   try {
     const browser = await puppeteer.launch({
-      // headless: false
+      headless: false
     });
     const page = await browser.newPage();
     page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36');
@@ -229,12 +224,20 @@ async function getReCaptchaCookie() {
     await button.click();
     await page.waitForNavigation('domcontentloaded');
 
+    console.log(cookieStr);
+    if (cookieStr) {
+      await axios.post('https://www.permcheckerapp.com/api/cookies', {
+        data: {
+          content: cookieStr,
+          internalKey: process.env.PERMCHECKER_BE_INTERNAL_KEY
+        }
+      });
+    }
 
     await browser.close();
-
-    return cookieStr;
   } catch (err) {
-    throw err;
+    winston.log('error', 'Cookie fetch failed', {err: err.message});
+    process.exit();
   }
 }
 
@@ -258,7 +261,7 @@ if (subcommand === 'latest') {
   let from = args[1];
   let to = args[2];
   crawlAllBetween(moment(from).tz('America/Los_Angeles'), moment(to).tz('America/Los_Angeles'));
-} else if (subcommand === 'test') {
+} else if (subcommand === 'cookie') {
   getReCaptchaCookie();
 } else {
   process.exit();

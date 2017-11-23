@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var { Case, Employer, sequelize } = require('../models');
+var { Case, Employer, Cookie, sequelize } = require('../models');
 var winston = require('winston');
 var caseProcessing = require('../utils/case-processing');
 var moment = require('moment-timezone');
@@ -319,6 +319,23 @@ router.get('/statistics', async function(req, res, next) {
     winston.log('error', '/statistics', {err: err.message});
     res.status(500).send('Something broke!')
   }
+});
+
+/**
+ * Update cookie
+ */
+router.post('/cookies', async function(req, res, next) {
+  let { content, internalKey } = req.body;
+  if (internalKey !== process.env.PERMCHECKER_BE_INTERNAL_KEY) {
+    res.status(403).send('STOP');
+  }
+  if (!content) {
+    res.status(500).send('Missing data');
+    return;
+  }
+
+  await Cookie.create({ content });
+  res.send(201);
 });
 
 module.exports = router;
