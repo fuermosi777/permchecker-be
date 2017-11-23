@@ -57,9 +57,15 @@ async function fetchDataAt(date, page) {
 
   let url = getUrl(date, page);
 
+  console.log(url)
+
   try {
     // @ts-ignore
-    let result = await axios.get(url);
+    let result = await axios.get(url, {
+      headers: {
+        Cookie: 'CFID=3329303; CFTOKEN=27791875; _ga=GA1.2.1582600602.1508110795; _gid=GA1.2.947110993.1511464025; NSC_TJMMKDSXFC_443_MC=ffffffff09391c5145525d5f4f58455e445a4a423660'
+      }
+    });
 
     if (result.hasOwnProperty('data')) {
 
