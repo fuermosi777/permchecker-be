@@ -328,6 +328,7 @@ router.post('/cookies', async function(req, res, next) {
   let { content, internalKey } = req.body;
   if (internalKey !== process.env.PERMCHECKER_BE_INTERNAL_KEY) {
     res.status(403).send('STOP');
+    return;
   }
   if (!content) {
     res.status(500).send('Missing data');

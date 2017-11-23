@@ -194,6 +194,9 @@ async function crawlAllBetween(from, to) {
   process.exit();
 }
 
+/**
+ * @async Should run locally
+ */
 async function getReCaptchaCookie() {
   let browser;
   try {
@@ -224,9 +227,13 @@ async function getReCaptchaCookie() {
     await button.click();
     await page.waitForNavigation('domcontentloaded');
 
-    console.log(cookieStr);
+    console.log('+++ ' + cookieStr + ' +++');
+
     if (cookieStr) {
-      await axios.post('https://www.permcheckerapp.com/api/cookies', {
+      // @ts-ignore
+      await axios({
+        method: 'post',
+        url: 'https://www.permcheckerapp.com/api/cookies',
         data: {
           content: cookieStr,
           internalKey: process.env.PERMCHECKER_BE_INTERNAL_KEY
