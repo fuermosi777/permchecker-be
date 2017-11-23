@@ -3,8 +3,13 @@ var axios = require('axios');
 var { Employer, Case, sequelize } = require('../models');
 var winston = require('winston');
 var { track, EVENT, TYPE } = require('../utils/tracker');
+var puppeteer = require('puppeteer');
 
 const ROWS = 100;
+const DOL_PERM_LANDING_PAGE_URL = 'https://lcr-pjr.doleta.gov/index.cfm?event=ehlcjrexternal.dsplcrlanding';
+
+/** @global {string} cookie */
+let cookie = '';
 
 /**
  * @typedef {[number, string, string, string, string, string, string, string, string, string, number, string, string]} Row
@@ -21,6 +26,11 @@ const ROWS = 100;
  * @property {Row[]} ROWS
  */
 
+function delay(timeout) {
+  return new Promise(resolve => {
+    setTimeout(resolve, timeout);
+  });
+}
 
 /**
  * Convert raw date text to PST date time
@@ -57,13 +67,28 @@ async function fetchDataAt(date, page) {
 
   let url = getUrl(date, page);
 
-  console.log(url)
+  // console.log(url);
+
+  if (!cookie) {
+    try {
+      cookie = await getReCaptchaCookie();
+    } catch (err) {
+      winston.log('error', 'cookie fetch failed', {err: err.message});
+      throw new Error('Cookie fetch failed');
+    }
+
+    winston.log('info', 'cookie updated successfully', {cookie});
+  }
+
+  if (!cookie) {
+    throw new Error('No cookie');
+  }
 
   try {
     // @ts-ignore
     let result = await axios.get(url, {
       headers: {
-        Cookie: 'CFID=3329303; CFTOKEN=27791875; _ga=GA1.2.1582600602.1508110795; _gid=GA1.2.947110993.1511464025; NSC_TJMMKDSXFC_443_MC=ffffffff09391c5145525d5f4f58455e445a4a423660'
+        Cookie: cookie
       }
     });
 
@@ -174,6 +199,45 @@ async function crawlAllBetween(from, to) {
   process.exit();
 }
 
+async function getReCaptchaCookie() {
+  let browser;
+  try {
+    const browser = await puppeteer.launch({
+      // headless: false
+    });
+    const page = await browser.newPage();
+    page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36');
+    await page.goto(DOL_PERM_LANDING_PAGE_URL);
+    page.setViewport({width: 1400, height: 900});
+
+    const frame = await page.frames().find(f => /.*www\.google\.com\/recaptcha.*/.test(f.url()));
+    await delay(2000);
+
+    await frame.waitForSelector('#recaptcha-anchor');
+    const checkbox = await frame.$('#recaptcha-anchor');
+    await checkbox.click();
+
+    await delay(4000);
+
+    let cookies = await page.cookies();
+    let cookieStr = cookies.reduce((a, b) => {
+      return `${b.name}=${b.value}; ${a}`;
+    }, '');
+
+    let button = await page.$('#submitButton');
+
+    await button.click();
+    await page.waitForNavigation('domcontentloaded');
+
+
+    await browser.close();
+
+    return cookieStr;
+  } catch (err) {
+    throw err;
+  }
+}
+
 /**
  * 
  * 
@@ -194,6 +258,8 @@ if (subcommand === 'latest') {
   let from = args[1];
   let to = args[2];
   crawlAllBetween(moment(from).tz('America/Los_Angeles'), moment(to).tz('America/Los_Angeles'));
+} else if (subcommand === 'test') {
+  getReCaptchaCookie();
 } else {
   process.exit();
 }
