@@ -204,7 +204,7 @@ router.get('/newapprovals', async function(req, res, next) {
   
       // Convert caseNumberPartial to real case date
       certifiedCounts.forEach(c => {
-        c.caseDate = caseProcessing.toDate(`A-${c.caseNumberPartial}-00000`)
+        c.date = caseProcessing.toDate(`A-${c.caseNumberPartial}-00000`)
       });
     } catch (err) {
       throw err;
