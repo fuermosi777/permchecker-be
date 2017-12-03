@@ -196,7 +196,7 @@ router.get('/newapprovals', async function(req, res, next) {
         order: [
           [ sequelize.fn('SUBSTRING', sequelize.col('caseNumber'), [3, 5]), 'DESC' ]
         ],
-        limit: 30,
+        limit: 45,
         raw: true
       });
   
