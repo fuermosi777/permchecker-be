@@ -13,8 +13,6 @@ function toDay(caseNumber) {
  * @return {object} moment object
  */
 function toDate(caseNumber) {
-  console.log(caseNumber);
-  
   let day = toDay(caseNumber);
   let year = day.substring(0, 2);
   let dayOfYear = Number(day.substring(2)) - 1;

@@ -104,6 +104,7 @@ router.get('/cases', async function(req, res, next) {
  * @property {number} total
  * @property {ApprovalStat[]} last30Days
  * @property {ApprovalStat[]} distribution
+ * @property {ApprovalStat[]} certifiedCounts
  * 
  */
 router.get('/newapprovals', async function(req, res, next) {
@@ -183,6 +184,32 @@ router.get('/newapprovals', async function(req, res, next) {
       }
     }
 
+    // Certified counts of latest 30 days
+    let certifiedCounts;
+    try {
+      certifiedCounts = await Case.findAll({
+        attributes: [
+          [ sequelize.fn('COUNT', '*'), 'total' ],
+          [ sequelize.fn('SUBSTRING', sequelize.col('caseNumber'), [3, 5]), 'caseNumberPartial' ]
+        ],
+        group: sequelize.fn('SUBSTRING', sequelize.col('caseNumber'), [3, 5]),
+        order: [
+          [ sequelize.fn('SUBSTRING', sequelize.col('caseNumber'), [3, 5]), 'DESC' ]
+        ],
+        limit: 30,
+        raw: true
+      });
+  
+      certifiedCounts.reverse();
+  
+      // Convert caseNumberPartial to real case date
+      certifiedCounts.forEach(c => {
+        c.caseDate = caseProcessing.toDate(`A-${c.caseNumberPartial}-00000`)
+      });
+    } catch (err) {
+      throw err;
+    }
+
     /** @type {NewApprovals} */
     let result = {
       date: moment(postingDate).format('YYYY-MM-DD'),
@@ -190,7 +217,8 @@ router.get('/newapprovals', async function(req, res, next) {
       latestDate: latest.date,
       total: latestApprovals.count,
       last30Days,
-      distribution
+      distribution,
+      certifiedCounts
     };
 
     res.json(result);
@@ -265,47 +293,6 @@ async function getStatistics(from, to) {
     throw err;
   }
 }
-
-/**
- * Get approval counts data for last serveral days
- * Group by certified date, (NOT posting date)
- */
-router.get('/approvalcounts', async function(req, res, next) {
-  let days = Number(req.query.days);
-
-  if (!days || days > 30) {
-    winston.log('error', '/approvalcounts', {err: `Too large days query`});
-    res.status(500).send('Something broke!');
-    return;
-  }
-
-  try {
-    let cases = await Case.findAll({
-      attributes: [
-        [ sequelize.fn('COUNT', '*'), 'total' ],
-        [ sequelize.fn('SUBSTRING', sequelize.col('caseNumber'), [3, 5]), 'caseNumberPartial' ]
-      ],
-      group: sequelize.fn('SUBSTRING', sequelize.col('caseNumber'), [3, 5]),
-      order: [
-        [ sequelize.fn('SUBSTRING', sequelize.col('caseNumber'), [3, 5]), 'DESC' ]
-      ],
-      limit: days,
-      raw: true
-    });
-
-    cases.reverse();
-
-    // Convert caseNumberPartial to real case date
-    cases.forEach(c => {
-      c.caseDate = caseProcessing.toDate(`A-${c.caseNumberPartial}-00000`)
-    });
-
-    res.json(cases);
-  } catch (err) {
-    winston.log('error', '/statistics', {err: err.message});
-    res.status(500).send('Something broke!')
-  }
-});
 
 /**
  * @param {string} range 'this-week', 'last-week', etc
