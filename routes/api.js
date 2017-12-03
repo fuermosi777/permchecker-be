@@ -267,6 +267,47 @@ async function getStatistics(from, to) {
 }
 
 /**
+ * Get approval counts data for last serveral days
+ * Group by certified date, (NOT posting date)
+ */
+router.get('/approvalcounts', async function(req, res, next) {
+  let days = Number(req.query.days);
+
+  if (!days || days > 30) {
+    winston.log('error', '/approvalcounts', {err: `Too large days query`});
+    res.status(500).send('Something broke!');
+    return;
+  }
+
+  try {
+    let cases = await Case.findAll({
+      attributes: [
+        [ sequelize.fn('COUNT', '*'), 'total' ],
+        [ sequelize.fn('SUBSTRING', sequelize.col('caseNumber'), [3, 5]), 'caseNumberPartial' ]
+      ],
+      group: sequelize.fn('SUBSTRING', sequelize.col('caseNumber'), [3, 5]),
+      order: [
+        [ sequelize.fn('SUBSTRING', sequelize.col('caseNumber'), [3, 5]), 'DESC' ]
+      ],
+      limit: days,
+      raw: true
+    });
+
+    cases.reverse();
+
+    // Convert caseNumberPartial to real case date
+    cases.forEach(c => {
+      c.caseDate = caseProcessing.toDate(`A-${c.caseNumberPartial}-00000`)
+    });
+
+    res.json(cases);
+  } catch (err) {
+    winston.log('error', '/statistics', {err: err.message});
+    res.status(500).send('Something broke!')
+  }
+});
+
+/**
  * @param {string} range 'this-week', 'last-week', etc
  * @return {{from: Date, to: Date}}
  */
