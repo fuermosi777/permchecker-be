@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "NODE_ENV=development nodemon ./bin/www",
+    "migrate": "sequelize db:migrate",
     "prod": "NODE_ENV=production forever start ./bin/www"
   },
   "dependencies": {

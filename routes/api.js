@@ -95,7 +95,7 @@ router.get('/cases', async function(req, res, next) {
 });
 
 async function crawlCaseApplication(caseInternalId) {
-  const url = `${DOL_PERM_CASE_DETAIL_URL}${caseInternalId}`;
+  const url = `${DOL_PERM_CASE_DETAIL_URL}${caseInternalId}`;  
 
   // @ts-ignore
   const response = await axios.get(url);
@@ -105,15 +105,22 @@ async function crawlCaseApplication(caseInternalId) {
   }
 
   const $ = cheerio.load(response.data);
+  let json = [];
 
-  $('.infoHolder').each((index, item) => {
-    let key = $(item).find('h5').text().trim().replace(/^\d+\.\s/, '');
-    let val = $(item).find('p').text().trim();
-    if (key && val) {
-      console.log(`"${key}": "${val}"`);
-    }
+  $('.infoList').each((index, item1) => {
+    let key1 = $(item1).find('.secHeader h4').text().trim();
+    let val1 = [];
+    $(item1).find('.infoHolder').each((index2, item2) => {
+      let key2 = $(item2).find('h5').text().trim().replace(/^\d+\.\s/, '');
+      let val2 = $(item2).find('p').text().trim().replace(/\n/, '').replace(/\t/, '').replace(/\s\s+/, ' ');
+      if (key2 && val2) {
+        val1.push({ key: key2, val: val2 });
+      }
+    });
+    json.push({ key: key1, val: val1 });
   });
   
+  return json;
 }
 
 router.get('/case/:id', async function(req, res, next) {
@@ -125,7 +132,9 @@ router.get('/case/:id', async function(req, res, next) {
     let c = await Case.findById(id);
 
     if (!c.application) {
-      let crawl = await crawlCaseApplication(c.internalId);
+      let crawlJson = await crawlCaseApplication(c.internalId);
+      c.application = crawlJson;
+      await c.save();
     }
 
     res.json(c);
