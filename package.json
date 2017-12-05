@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "NODE_ENV=development nodemon ./bin/www",
     "migrate": "sequelize db:migrate",
+    "nginx": "rm -rf /var/cache/nginx/ && sudo systemctl reload nginx",
     "prod": "NODE_ENV=production forever start ./bin/www"
   },
   "dependencies": {
