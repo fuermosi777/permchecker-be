@@ -5,6 +5,10 @@ var winston = require('winston');
 var caseProcessing = require('../utils/case-processing');
 var moment = require('moment-timezone');
 var checkPassport = require('../middlewares/check-passport');
+var axios = require('axios');
+var cheerio = require('cheerio')
+
+const DOL_PERM_CASE_DETAIL_URL = 'https://lcr-pjr.doleta.gov/index.cfm?event=ehLCJRExternal.dspCert&doc_id=3&visa_class_id=6&id=';
 
 const { Op } = sequelize;
 
@@ -85,6 +89,48 @@ router.get('/cases', async function(req, res, next) {
     res.json(json);
   } catch (err) {
     winston.log('error', '/cases', {err: err.message});
+    res.status(500).send('Something broke!');
+    return;
+  }
+});
+
+async function crawlCaseApplication(caseInternalId) {
+  const url = `${DOL_PERM_CASE_DETAIL_URL}${caseInternalId}`;
+
+  // @ts-ignore
+  const response = await axios.get(url);
+
+  if (!response.data) {
+    throw new Error(`Cannot get HTML of ${url}`);
+  }
+
+  const $ = cheerio.load(response.data);
+
+  $('.infoHolder').each((index, item) => {
+    let key = $(item).find('h5').text().trim().replace(/^\d+\.\s/, '');
+    let val = $(item).find('p').text().trim();
+    if (key && val) {
+      console.log(`"${key}": "${val}"`);
+    }
+  });
+  
+}
+
+router.get('/case/:id', async function(req, res, next) {
+  try {
+    let id = req.params.id;
+
+    if (!id) throw new Error('Missing param ID');
+
+    let c = await Case.findById(id);
+
+    if (!c.application) {
+      let crawl = await crawlCaseApplication(c.internalId);
+    }
+
+    res.json(c);
+  } catch (err) {
+    winston.log('error', '/case', {err: err.message});
     res.status(500).send('Something broke!');
     return;
   }

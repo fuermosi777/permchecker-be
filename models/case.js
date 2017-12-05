@@ -54,6 +54,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       onUpdate: 'CASCADE',
       onDelete: 'RESTRICT'
+    },
+    application: {
+      type: DataTypes.JSON,
+      allowNull: true
     }
   }, {
     getterMethods: {
