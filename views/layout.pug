@@ -1,8 +1,49 @@
 doctype html
 html
   head
-    title Permchecker
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    title Permchecker for DOL App
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    <meta name="keywords" content="PERM, perm, greencard, green card, h1b, dol, lca, visa, work visa, wroking visa, eb1, eb2, immigration, permtrack">
+    <meta name="description" content="Download the iOS and Android app to check the latest Permanent Labor Certification (PERM) stats, search for previous case filing status and application info. Track your case status with A-* number.">
     link(rel='stylesheet', href='/stylesheets/style.css')
+
+    //- fav
+    <link rel="apple-touch-icon" sizes="57x57" href="/images/fav.ico/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/images/fav.ico/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/images/fav.ico/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/fav.ico/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/images/fav.ico/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/images/fav.ico/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/images/fav.ico/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/images/fav.ico/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/fav.ico/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="/images/fav.ico/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/fav.ico/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/images/fav.ico/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/fav.ico/favicon-16x16.png">
+    <link rel="manifest" href="/images/fav.ico/manifest.json">
+    <meta name="msapplication-TileColor" content="#9753F4">
+    <meta name="msapplication-TileImage" content="/images/fav.ico/ms-icon-144x144.png">
+    <meta name="theme-color" content="#9753F4">
+
+    //- full-page.js
+    //- link(ref='stylesheet', type='text/css', href='https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.9.5/jquery.fullpage.min.css')
+    //- script(src='http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js')
+    //- script(src='https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.9.5/jquery.fullpage.min.js')
+    //- script(src='/scripts/index.js')
+    //- script(async, src='https://www.googletagmanager.com/gtag/js?id=UA-110755422-1')
+
+    //- bootstrap
+    //- link(ref='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb', crossorigin='anonymous')
+    //- script(src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js')
+    //- script(src='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js')
+
+    script.
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-110755422-1');
   body
     block content

@@ -1,5 +1,40 @@
 extends layout
 
+mixin buttons
+  .demo-buttons
+    <a href="https://itunes.apple.com/us/app/permchecker-for-dol/id1307750937?mt=8" style="display:inline-block;overflow:hidden;background:url(https://designpieces.com/wp-content/uploads/2016/02/download-on-the-app-store.png) no-repeat;width:135px;height:40px;background-size:contain;margin: 0 5px;"></a>
+    <a href='https://play.google.com/store/apps/details?id=com.permchecker&hl=en&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://designpieces.com/wp-content/uploads/2016/02/google-play-badge.png' style="height: 40px; margin: 0 5px;"/></a>
+
 block content
-  h1 Permchecker
-  p Welcome to Permchecker
+  .bg
+    .section
+      .nav
+        .logo
+          img.logo-image(src='/images/icon-light.png')
+        .logo-text Permchecker for DOL
+      .demo
+        .demo-text
+          .demo-title Get to know everything about Perm
+          .demo-detail Check the latest Permanent Labor Certification (PERM) stats: you can view approvals of last 30 days, approvals by case number of latest date, and see total approvals stat of recent 45 case dates.
+          +buttons
+        .demo-graphic
+          .demo-phone
+            img.demo-image(src='/images/demo-1.png')
+      .demo
+        .demo-text
+          .demo-title Better insight analysis, better estimation
+          .demo-detail Check the top 10 by employer and by state of current week, last week, current month and current year.
+          +buttons
+        .demo-graphic
+          .demo-phone
+            img.demo-image(src='/images/demo-2.png')
+      .demo
+        .demo-text
+          .demo-title Search PERM filing records for recent years
+          .demo-detail All previous filing data are searchable. Start searching by A-* number, company name or other information. Track your own case with the number and get notified when it's certified.
+          +buttons
+        .demo-graphic
+          .demo-phone
+            img.demo-image(src='/images/demo-3.png')
+      p.copy-light Permchecker by #[a(href='http://liuhao.im') Hao Liu] &copy; 2017 - present<br>Made in Sunnyvale
+

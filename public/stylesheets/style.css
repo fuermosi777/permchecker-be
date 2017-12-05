@@ -6,8 +6,7 @@
 
 body {
   margin: 0;
-  padding: 15px;
-  font-family: "SF UI Text", "Helvetica Neue",HelveticaNeue,Helvetica,Arial,sans-serif;
+  font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 a {
@@ -27,12 +26,185 @@ img.icon {
   text-align: center;
 }
 
-ul {
-
-}
-
 p.copy {
   color: #696969;
   font-size: 13px;
   text-align: center;
+}
+
+p.copy-light {
+  color: white;
+  opacity: 0.8;
+  font-size: 13px;
+}
+
+p.copy-light a {
+  color: white;
+}
+
+.main {
+  padding: 30px 15px;
+}
+
+/* home index */
+.section {
+  width: 80vw;
+  margin: 0 auto;
+  padding-bottom: 60px;
+}
+
+.bg {
+  height: 100%;
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#a777df+0,965af0+100 */
+  background: #a777df; /* Old browsers */
+  background: -moz-linear-gradient(top, #a777df 0%, #965af0 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, #a777df 0%,#965af0 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, #a777df 0%,#965af0 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a777df', endColorstr='#965af0',GradientType=0 ); /* IE6-9 */
+}
+
+.nav {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-top: 3vw;
+}
+
+.logo-image {
+  height: 42px;
+  margin-right: 15px;
+}
+
+.logo-text {
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  opacity: 0.9;
+}
+
+.demo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 40px;
+}
+
+.demo:nth-child(odd) {
+  direction: rtl;
+}
+
+.demo-text {
+  width: 40vw;
+  padding: 0 20px;
+}
+
+.demo-title {
+  font-size: 28px;
+  color: white;
+  opacity: 0.9;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.demo-detail {
+  font-size: 14px;
+  color: white;
+  opacity: 0.7;
+  letter-spacing: 1px;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+.demo-buttons {
+  padding-top: 20px;
+  display: flex;
+}
+
+.demo-phone {
+  width: 25vw;
+  padding: 5.5vw 1.2vw;
+  background: white;
+  border-radius: 4vw;
+  box-shadow: 0px 0px 20px 1px rgba(255,255,255,0.5);
+}
+
+.demo-image {
+  width: 100%;
+  border: 2px solid #9753F4;
+  border-radius: 4px;
+}
+
+@media (max-width: 680px) {
+  .nav {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 20px;
+  }
+  
+  .logo-image {
+    height: 36px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+  }
+  
+  .logo-text {
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    opacity: 0.9;
+  }
+  
+  .demo {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .demo:nth-child(odd) {
+    direction: unset;
+  }
+  
+  .demo-text {
+    width: 100%;
+    padding: 40px 0 40px;
+    text-align: center;
+  }
+  
+  .demo-title {
+    font-size: 26px;
+    color: white;
+    opacity: 0.9;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .demo-detail {
+    font-size: 16px;
+    color: white;
+    opacity: 0.7;
+    letter-spacing: 1px;
+    font-weight: 300;
+    line-height: 1.6;
+    text-align: left;
+  }
+
+  .demo-buttons {
+    justify-content: center;
+  }
+  
+  .demo-phone {
+    width: 90vw;
+    padding: 18vw 3vw;
+    background: white;
+    border-radius: 11vw;
+    box-shadow: 0px 0px 20px 1px rgba(255,255,255,0.5);
+  }
+  
+  .demo-image {
+    width: 100%;
+    border: 2px solid #9753F4;
+    border-radius: 4px;
+  }
 }
