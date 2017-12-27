@@ -82,6 +82,19 @@ p.copy-light a {
   opacity: 0.9;
 }
 
+.stat {
+  color: white;
+  font-size: 20px;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  text-align: center;
+  padding-top: 10px;
+}
+
+.stat p {
+  margin: 0 0 10px 0;
+}
+
 .demo {
   display: flex;
   flex-direction: row;
@@ -90,12 +103,12 @@ p.copy-light a {
   padding-bottom: 40px;
 }
 
-.demo:nth-child(odd) {
+.demo:nth-child(even) {
   direction: rtl;
 }
 
 .demo-text {
-  width: 40vw;
+  width: 44vw;
   padding: 0 20px;
 }
 

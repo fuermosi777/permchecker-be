@@ -12,6 +12,10 @@ block content
         .logo
           img.logo-image(src='/images/icon-light.png')
         .logo-text Permchecker for DOL
+      if data
+        .stat
+          p DOL PERM Stats for #{data.date}
+          p <strong>#{data.total}</strong> records processed<br/>Earliest: #{data.earliestDate}<br/>Latest: #{data.latestDate}
       .demo
         .demo-text
           .demo-title Get to know everything about Perm
