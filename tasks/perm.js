@@ -100,6 +100,10 @@ async function fetchDataAt(date, page) {
         page: `${page}/${data.TOTAL}`
       });
 
+      if (!data.TOTAL) {
+        throw new Error('Shit happens! Data is incorrect');
+      }
+
       /** @type {Row[]} */
       let rows = data.ROWS;
 
