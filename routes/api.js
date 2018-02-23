@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var { Case, Employer, Cookie, sequelize } = require('../models');
+var { Case, Employer, Cookie, Status, sequelize } = require('../models');
 var winston = require('winston');
 var caseProcessing = require('../utils/case-processing');
 var moment = require('moment-timezone');
@@ -157,6 +157,7 @@ router.get('/case/:id', async function(req, res, next) {
  * @property {string} earliestDate
  * @property {string} latestDate
  * @property {number} total
+ * @property {string} status
  * @property {ApprovalStat[]} last30Days
  * @property {ApprovalStat[]} distribution
  * @property {ApprovalStat[]} certifiedCounts
@@ -265,11 +266,26 @@ router.get('/newapprovals', async function(req, res, next) {
       throw err;
     }
 
+    // Get USCIS status
+    let status = '';
+    try {
+      const latestStatus = await Status.findOne({
+        order: [ [ 'createdAt', 'DESC' ]]
+      });
+
+      if (latestStatus && !latestStatus.isDone) {
+        status = latestStatus.content;
+      }
+    } catch (err) {
+      throw err;
+    }
+
     /** @type {NewApprovals} */
     let result = {
       date: moment(postingDate).format('YYYY-MM-DD'),
       earliestDate: earliest.date,
       latestDate: latest.date,
+      status,
       total: latestApprovals.count,
       last30Days,
       distribution,
