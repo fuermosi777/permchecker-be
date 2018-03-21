@@ -205,7 +205,8 @@ async function getReCaptchaCookie() {
   let browser;
   try {
     const browser = await puppeteer.launch({
-      headless: false
+      headless: false,
+      timeout: 5 * 60 * 1000 // 5 min
     });
     const page = await browser.newPage();
     page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36');
