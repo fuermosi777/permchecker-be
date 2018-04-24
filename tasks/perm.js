@@ -209,6 +209,7 @@ async function getReCaptchaCookie() {
       timeout: 5 * 60 * 1000 // 5 min
     });
     const page = await browser.newPage();
+    page.setDefaultNavigationTimeout(5 * 60 * 1000);
     page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36');
     await page.goto(DOL_PERM_LANDING_PAGE_URL);
     page.setViewport({width: 1400, height: 900});
