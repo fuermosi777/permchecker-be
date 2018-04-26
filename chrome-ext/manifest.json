@@ -1,0 +1,14 @@
+{
+  "name": "Fetch perm website cookie",
+  "version": "1.0",
+  "browser_action": {
+    "default_icon": "icon.png"
+  },
+  "description": "Grab cookies after passing recaptcha and post to database",
+  "permissions": [ "activeTab", "notifications", "storage", "cookies", "tabs", "http://*/*", "https://*/*" ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "manifest_version": 2
+}
