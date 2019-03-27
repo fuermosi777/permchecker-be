@@ -23,3 +23,7 @@ API (should correct to America time)
 mobile
 
 So need to 
+
+# Cert expired?
+
+Renew it. Reload Nginx.

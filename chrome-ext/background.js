@@ -1,10 +1,10 @@
-function getCookies(domain, name, callback) {
+function getCookies(domain) {
   return new Promise((resolve, reject) => {
-    chrome.cookies.get({"url": domain, "name": name}, function(cookie) {
-      console.log(cookie);
+    chrome.cookies.getAll({ url: domain }, function(cookie) {
+      console.log(`Get cookies:`, cookie);
 
       if (cookie) {
-        resolve(cookie.value);
+        resolve(cookie);
       } else {
         reject();
       }
@@ -17,40 +17,50 @@ function sendToDb(content) {
 
   request.open("POST", "https://www.permcheckerapp.com/api/cookies", true);
   request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  request.send(JSON.stringify({
-    content,
-    internalKey: 'frVepRnz6v6ggsQ'
-  }));
+  request.send(
+    JSON.stringify({
+      content,
+      internalKey: "frVepRnz6v6ggsQ"
+    })
+  );
 }
 
-let cookieContent = '';
+let cookieContent = "";
 
 //usage:
-chrome.browserAction.onClicked.addListener(function(tab) { 
+chrome.browserAction.onClicked.addListener(function(tab) {
+  getCookies("https://lcr-pjr.doleta.gov")
+    .then(cookieContent => {
+      console.log(cookieContent);
 
-getCookies("https://lcr-pjr.doleta.gov", "CFID").then(cfid => {
-    cookieContent += `CFID=${cfid};`;
-    return getCookies("https://lcr-pjr.doleta.gov", "CFTOKEN");
-  }).then(cftoken => {
-    cookieContent += ` CFTOKEN=${cftoken};`;
-    return getCookies("https://lcr-pjr.doleta.gov", "NSC_TJMMKDSXFC_443_MC");
-  }).then(nsc => {
-    cookieContent += ` NSC_TJMMKDSXFC_443_MC=${nsc};`;
+      cookieContent = cookieContent.map(cookie => `${cookie.name}=${cookie.value};`).join(' ');
 
-    chrome.extension.getBackgroundPage().console.log('cookie content done: ' + cookieContent);
+      chrome.extension
+        .getBackgroundPage()
+        .console.log("cookie content done: " + cookieContent);
 
-    let today = new Date().toISOString().split('T')[0];
+      let today = new Date().toISOString().split("T")[0];
 
-    chrome.storage.local.get(['today'], function(result) {
-      console.log(result.key, today);
+      chrome.storage.local.get(["today"], function(result) {
+        console.log(result.key, today);
+      });
+
+      sendToDb(cookieContent);
+      chrome.notifications.create(null, {
+        type: "basic",
+        title: "Permchecker",
+        message: "PERM cookie sent to DB",
+        iconUrl: "icon.png"
+      });
+
+      chrome.extension.getBackgroundPage().console.log("Done");
+    })
+    .catch(err => {
+      chrome.notifications.create(null, {
+        type: "basic",
+        title: "Permchecker",
+        message: "Error",
+        iconUrl: "icon.png"
+      });
     });
-    
-    sendToDb(cookieContent);    
-    chrome.notifications.create(null, {type:'basic', title: 'Permchecker', message: 'PERM cookie sent to DB', iconUrl: 'icon.png'});
-
-    chrome.extension.getBackgroundPage().console.log('Done');
-  }).catch(err => {
-    chrome.notifications.create(null, {type:'basic', title: 'Permchecker', message: 'Error', iconUrl: 'icon.png'});
-  });
-
 });
